@@ -215,7 +215,7 @@ extension FlutterArkitView {
                 return
         }
         
-        if let sceneUrl = Bundle.main.url(forResource: sceneName, withExtension: "dae"),
+        if let sceneUrl = Bundle.main.url(forResource: sceneName, withExtension: "usdz"),
             let sceneSource = SCNSceneSource(url: sceneUrl, options: nil),
             let animation = sceneSource.entryWithIdentifier(animationIdentifier, withClass: CAAnimation.self) {
             animation.repeatCount = 1

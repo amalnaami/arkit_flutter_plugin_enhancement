@@ -19,6 +19,7 @@ import 'package:arkit_plugin_example/snapshot_scene.dart';
 import 'package:arkit_plugin_example/tap_page.dart';
 import 'package:arkit_plugin_example/face_detection_page.dart';
 import 'package:arkit_plugin_example/panorama_page.dart';
+import 'package:arkit_plugin_example/track.dart';
 import 'package:arkit_plugin_example/video_page.dart';
 import 'package:arkit_plugin_example/widget_projection.dart';
 import 'package:arkit_plugin_example/real_time_updates.dart';
@@ -30,6 +31,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final samples = [
+      Sample(
+        'AR Kit Face Tracking With Obj Model',
+        'AR Kit Face Tracking With Obj Model',
+        Icons.home,
+        () => Navigator.of(context)
+            .push<void>(MaterialPageRoute(builder: (c) => ARKitFaceTrackingWithObjModel())),
+      ),
       Sample(
         'Hello World',
         'The simplest scene with all geometries.',

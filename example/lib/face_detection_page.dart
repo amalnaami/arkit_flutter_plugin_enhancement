@@ -60,12 +60,34 @@ class _FaceDetectionPageState extends State<FaceDetectionPage> {
       transform.getColumn(3).z,
     );
     final material = ARKitMaterial(
-      diffuse: ARKitMaterialProperty.color(Colors.yellow),
+      diffuse: ARKitMaterialProperty.image(
+        'https://freesvg.org/img/maqndon-MyHeart.png',
+      ),
     );
     final sphere = ARKitBox(
-        materials: [material], width: 0.03, height: 0.03, length: 0.03);
+        materials: [material], width: 0.05, height: 0.05, length: 0.00);
 
     return ARKitNode(geometry: sphere, position: position);
+  }
+
+  ARKitNode _createFace() {
+    final material = ARKitMaterial(
+      lightingModelName: ARKitLightingModel.constant,
+      diffuse: ARKitMaterialProperty.image(
+        'assets/makeup2.png',
+      ),
+    );
+    final sphere = ARKitBox(
+      materials: [material],
+      width: 0.15,
+      height: 0.15,
+      length: 0,
+    );
+    return ARKitNode(
+      geometry: sphere,
+      position: vector.Vector3(0, 0, 0),
+      eulerAngles: vector.Vector3.zero(),
+    );
   }
 
   void _handleUpdateAnchor(ARKitAnchor anchor) {
