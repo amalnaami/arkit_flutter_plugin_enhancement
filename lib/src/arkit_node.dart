@@ -98,7 +98,7 @@ class ARKitNode {
   /// Determines the rendering order of the receiver.
   /// Nodes with greater rendering orders are rendered last.
   /// Defaults to 0.
-  int renderingOrder;
+  final int renderingOrder;
 
   /// Determines the visibility of the node’s contents.
   /// Defaults to false.

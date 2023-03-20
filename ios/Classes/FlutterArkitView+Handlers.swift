@@ -1,16 +1,37 @@
 import ARKit
+import SceneKit
+import UIKit
 
 extension FlutterArkitView {
     func onAddNode(_ arguments: Dictionary<String, Any>) {
+        let faceGeometry = ARSCNFaceGeometry(device: sceneView.device!)!
+        faceGeometry.firstMaterial!.colorBufferWriteMask = []
+        let material = faceGeometry.firstMaterial!
+        //let image = UIImage(named: "face.jpg")
+        //material.diffuse.contents = image  // Example texture map image.
+        //material.lightingModel = .physicallyBased
+        //material.diffuse.contents = UIImage(named: "facepaint") // Example texture map image.
+        //material.lightingModel = .physicallyBased
+        var occlusionNode = SCNNode(geometry: faceGeometry)
+        occlusionNode.renderingOrder = -1
+        var contentNode: SCNNode! = SCNNode(geometry: faceGeometry)
+        contentNode!.addChildNode(occlusionNode)
         let geometryArguments = arguments["geometry"] as? Dictionary<String, Any>
         let geometry = createGeometry(geometryArguments, withDevice: sceneView.device)
         let node = createNode(geometry, fromDict: arguments, forDevice: sceneView.device)
+        //node.childNode(withName: "text", recursively: true)?.geometry?.materials = [material]
+
+        contentNode!.addChildNode(node)
         if let parentNodeName = arguments["parentNodeName"] as? String {
             let parentNode = sceneView.scene.rootNode.childNode(withName: parentNodeName, recursively: true)
-            parentNode?.addChildNode(node)
+            parentNode?.addChildNode(contentNode)
         } else {
             sceneView.scene.rootNode.addChildNode(node)
+
         }
+        //let contentNode = SCNNode()
+        //contentNode!.addChildNode(occlusionNode)
+        //contentNode!.addChildNode(node)
     }
   
     func onUpdateNode(_ arguments: Dictionary<String, Any>) {

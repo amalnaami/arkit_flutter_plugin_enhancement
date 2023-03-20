@@ -8,6 +8,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  path_provider: ^2.0.13
+  gallery_saver: ^2.3.2
+  image_picker: ^0.8.7
+  flutter_file_dialog: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -19,3 +23,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/face.jpg
+    - assets/fox.jpg
+    - assets/fox.png
+    - assets/wireframeTexture.jpg
