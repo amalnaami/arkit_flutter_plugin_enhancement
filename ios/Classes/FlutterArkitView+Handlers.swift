@@ -1,18 +1,39 @@
 import ARKit
+import SceneKit
+import UIKit
 
 extension FlutterArkitView {
     func onAddNode(_ arguments: Dictionary<String, Any>) {
+        let faceGeometry = ARSCNFaceGeometry(device: sceneView.device!)!
+        faceGeometry.firstMaterial!.colorBufferWriteMask = []
+        let material = faceGeometry.firstMaterial!
+        //let image = UIImage(named: "face.jpg")
+        //material.diffuse.contents = image  // Example texture map image.
+        //material.lightingModel = .physicallyBased
+        //material.diffuse.contents = UIImage(named: "facepaint") // Example texture map image.
+        //material.lightingModel = .physicallyBased
+        var occlusionNode = SCNNode(geometry: faceGeometry)
+        occlusionNode.renderingOrder = -1
+        var contentNode: SCNNode! = SCNNode(geometry: faceGeometry)
+        contentNode!.addChildNode(occlusionNode)
         let geometryArguments = arguments["geometry"] as? Dictionary<String, Any>
         let geometry = createGeometry(geometryArguments, withDevice: sceneView.device)
         let node = createNode(geometry, fromDict: arguments, forDevice: sceneView.device)
+        //node.childNode(withName: "text", recursively: true)?.geometry?.materials = [material]
+
+        contentNode!.addChildNode(node)
         if let parentNodeName = arguments["parentNodeName"] as? String {
             let parentNode = sceneView.scene.rootNode.childNode(withName: parentNodeName, recursively: true)
-            parentNode?.addChildNode(node)
+            parentNode?.addChildNode(contentNode)
         } else {
             sceneView.scene.rootNode.addChildNode(node)
+
         }
+        //let contentNode = SCNNode()
+        //contentNode!.addChildNode(occlusionNode)
+        //contentNode!.addChildNode(node)
     }
-  
+
     func onUpdateNode(_ arguments: Dictionary<String, Any>) {
       guard let nodeName = arguments["nodeName"] as? String else {
           logPluginError("nodeName deserialization failed", toChannel: channel)
@@ -31,7 +52,7 @@ extension FlutterArkitView {
       }
       updateNode(node, fromDict: arguments, forDevice: sceneView.device)
     }
-  
+
     func onRemoveNode(_ arguments: Dictionary<String, Any>) {
         guard let nodeName = arguments["nodeName"] as? String else {
             logPluginError("nodeName deserialization failed", toChannel: channel)
@@ -40,7 +61,7 @@ extension FlutterArkitView {
         let node = sceneView.scene.rootNode.childNode(withName: nodeName, recursively: true)
         node?.removeFromParentNode()
     }
-  
+
     func onRemoveAnchor(_ arguments: Dictionary<String, Any>) {
         guard let anchorIdentifier = arguments["anchorIdentifier"] as? String else {
             logPluginError("anchorIdentifier deserialization failed", toChannel: channel)
@@ -50,7 +71,7 @@ extension FlutterArkitView {
             sceneView.session.remove(anchor: anchor)
         }
     }
-    
+
     func onGetNodeBoundingBox(_ arguments: Dictionary<String, Any>, _ result:FlutterResult) {
         guard let geometryArguments = arguments["geometry"] as? Dictionary<String, Any> else {
             logPluginError("geometryArguments deserialization failed", toChannel: channel)
@@ -59,11 +80,11 @@ extension FlutterArkitView {
         }
         let geometry = createGeometry(geometryArguments, withDevice: sceneView.device)
         let node = createNode(geometry, fromDict: arguments, forDevice: sceneView.device)
-        
+
         let resArray = [serializeVector(node.boundingBox.min), serializeVector(node.boundingBox.max)]
         result(resArray)
     }
-    
+
     func onTransformChanged(_ arguments: Dictionary<String, Any>) {
         guard let name = arguments["name"] as? String,
             let params = arguments["transformation"] as? Array<NSNumber>
@@ -77,7 +98,7 @@ extension FlutterArkitView {
             logPluginError("node not found", toChannel: channel)
         }
     }
-    
+
     func onIsHiddenChanged(_ arguments: Dictionary<String, Any>) {
         guard let name = arguments["name"] as? String,
             let params = arguments["isHidden"] as? Bool
@@ -91,7 +112,7 @@ extension FlutterArkitView {
             logPluginError("node not found", toChannel: channel)
         }
     }
-    
+
     func onUpdateSingleProperty(_ arguments: Dictionary<String, Any>) {
         guard let name = arguments["name"] as? String,
             let args = arguments["property"] as? Dictionary<String, Any>,
@@ -102,7 +123,7 @@ extension FlutterArkitView {
                 logPluginError("deserialization failed", toChannel: channel)
                 return
         }
-        
+
         if let node = sceneView.scene.rootNode.childNode(withName: name, recursively: true) {
             if let obj = node.value(forKey: keyProperty) as? NSObject {
                 obj.setValue(propertyValue, forKey: propertyName)
@@ -113,7 +134,7 @@ extension FlutterArkitView {
             logPluginError("node not found", toChannel: channel)
         }
     }
-    
+
     func onUpdateMaterials(_ arguments: Dictionary<String, Any>) {
         guard let name = arguments["name"] as? String,
             let rawMaterials = arguments["materials"] as? Array<Dictionary<String, Any>>
@@ -122,14 +143,14 @@ extension FlutterArkitView {
                 return
         }
         if let node = sceneView.scene.rootNode.childNode(withName: name, recursively: true) {
-            
+
             let materials = parseMaterials(rawMaterials)
             node.geometry?.materials = materials
         } else {
             logPluginError("node not found", toChannel: channel)
         }
     }
-    
+
     func onUpdateFaceGeometry(_ arguments: Dictionary<String, Any>) {
         #if !DISABLE_TRUEDEPTH_API
         guard let name = arguments["name"] as? String,
@@ -143,7 +164,7 @@ extension FlutterArkitView {
             let geometry = node.geometry as? ARSCNFaceGeometry,
             let anchor = sceneView.session.currentFrame?.anchors.first(where: {$0.identifier.uuidString == fromAnchorId}) as? ARFaceAnchor
         {
-            
+
             geometry.update(from: anchor.geometry)
         } else {
             logPluginError("node not found, geometry was empty, or anchor not found", toChannel: channel)
@@ -152,7 +173,7 @@ extension FlutterArkitView {
         logPluginError("TRUEDEPTH_API disabled", toChannel: channel)
         #endif
     }
-    
+
     func onPerformHitTest(_ arguments: Dictionary<String, Any>, _ result:FlutterResult) {
         guard let x = arguments["x"] as? Double,
             let y = arguments["y"] as? Double else {
@@ -166,7 +187,7 @@ extension FlutterArkitView {
         let arHitResults = getARHitResultsArray(sceneView, atLocation: location)
         result(arHitResults)
     }
-    
+
     func onGetLightEstimate(_ result:FlutterResult) {
         let frame = sceneView.session.currentFrame
         if let lightEstimate = frame?.lightEstimate {
@@ -176,7 +197,7 @@ extension FlutterArkitView {
             result(nil)
         }
     }
-    
+
     func onProjectPoint(_ arguments: Dictionary<String, Any>, _ result:FlutterResult) {
         guard let rawPoint = arguments["point"] as? Array<Double> else {
             logPluginError("deserialization failed", toChannel: channel)
@@ -188,7 +209,7 @@ extension FlutterArkitView {
         let res = serializeVector(projectedPoint)
         result(res)
     }
-    
+
     func onCameraProjectionMatrix(_ result:FlutterResult) {
         if let frame = sceneView.session.currentFrame {
             let matrix = serializeMatrix(frame.camera.projectionMatrix)
@@ -197,7 +218,7 @@ extension FlutterArkitView {
             result(nil)
         }
     }
-  
+
     func onPointOfViewTransform(_ result:FlutterResult) {
         if let pointOfView = sceneView.pointOfView {
           let matrix = serializeMatrix(pointOfView.simdWorldTransform)
@@ -206,7 +227,7 @@ extension FlutterArkitView {
             result(nil)
         }
     }
-    
+
     func onPlayAnimation(_ arguments: Dictionary<String, Any>) {
         guard let key = arguments["key"] as? String,
             let sceneName = arguments["sceneName"] as? String,
@@ -214,7 +235,7 @@ extension FlutterArkitView {
                 logPluginError("deserialization failed", toChannel: channel)
                 return
         }
-        
+
         if let sceneUrl = Bundle.main.url(forResource: sceneName, withExtension: "usdz"),
             let sceneSource = SCNSceneSource(url: sceneUrl, options: nil),
             let animation = sceneSource.entryWithIdentifier(animationIdentifier, withClass: CAAnimation.self) {
@@ -226,7 +247,7 @@ extension FlutterArkitView {
             logPluginError("animation failed", toChannel: channel)
         }
     }
-    
+
     func onStopAnimation(_ arguments: Dictionary<String, Any>) {
         guard let key = arguments["key"] as? String else {
             logPluginError("deserialization failed", toChannel: channel)
@@ -252,5 +273,9 @@ extension FlutterArkitView {
         } else {
             result(nil)
         }
+    }
+
+    func onRecordVideo(_ result:FlutterResult){
+        print("test")
     }
 }

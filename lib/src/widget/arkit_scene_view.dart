@@ -213,27 +213,27 @@ class _ARKitSceneViewState extends State<ARKitSceneView> {
 /// callback for an [ARKitSceneView] widget.
 class ARKitController {
   ARKitController._init(
-    int id,
-    ARKitConfiguration configuration,
-    ARWorldTrackingConfigurationEnvironmentTexturing environmentTexturing,
-    bool showStatistics,
-    bool autoenablesDefaultLighting,
-    bool enableTapRecognizer,
-    bool showFeaturePoints,
-    bool showWorldOrigin,
-    bool enablePinchRecognizer,
-    bool enablePanRecognizer,
-    bool enableRotationRecognizer,
-    ARPlaneDetection planeDetection,
-    ARWorldAlignment worldAlignment,
-    String? detectionImagesGroupName,
-    List<ARKitReferenceImage>? detectionImages,
-    String? trackingImagesGroupName,
-    List<ARKitReferenceImage>? trackingImages,
-    bool forceUserTapOnCenter,
-    int maximumNumberOfTrackedImages,
-    this.debug,
-  ) {
+      int id,
+      ARKitConfiguration configuration,
+      ARWorldTrackingConfigurationEnvironmentTexturing environmentTexturing,
+      bool showStatistics,
+      bool autoenablesDefaultLighting,
+      bool enableTapRecognizer,
+      bool showFeaturePoints,
+      bool showWorldOrigin,
+      bool enablePinchRecognizer,
+      bool enablePanRecognizer,
+      bool enableRotationRecognizer,
+      ARPlaneDetection planeDetection,
+      ARWorldAlignment worldAlignment,
+      String? detectionImagesGroupName,
+      List<ARKitReferenceImage>? detectionImages,
+      String? trackingImagesGroupName,
+      List<ARKitReferenceImage>? trackingImages,
+      bool forceUserTapOnCenter,
+      int maximumNumberOfTrackedImages,
+      this.debug,
+      ) {
     _channel = MethodChannel('arkit_$id');
     _channel.setMethodCallHandler(_platformCallHandler);
     _channel.invokeMethod<void>('init', {
@@ -297,7 +297,7 @@ class ARKitController {
 
   /// Called when camera tracking state is changed;
   Function(ARTrackingState trackingState, ARTrackingStateReason? reason)?
-      onCameraDidChangeTrackingState;
+  onCameraDidChangeTrackingState;
 
   /// This is called when the view deactivates, either manually or automatically
   /// Set this function to do any custom actions your app requires to begin
@@ -326,10 +326,10 @@ class ARKitController {
   }
 
   Future<void> update(
-    String nodeName, {
-    ARKitNode? node,
-    List<ARKitMaterial>? materials,
-  }) {
+      String nodeName, {
+        ARKitNode? node,
+        List<ARKitMaterial>? materials,
+      }) {
     final params = <String, dynamic>{'nodeName': nodeName};
     if (node != null) {
       params.addAll(node.toMap());
@@ -356,7 +356,7 @@ class ARKitController {
       {required double x, required double y}) async {
     assert(x > 0 && y > 0);
     final results =
-        await _channel.invokeListMethod('performHitTest', {'x': x, 'y': y});
+    await _channel.invokeListMethod('performHitTest', {'x': x, 'y': y});
     if (results == null) {
       return [];
     } else {
@@ -370,7 +370,7 @@ class ARKitController {
   Future<List<Vector3>> getNodeBoundingBox(ARKitNode node) async {
     final params = _addParentNodeNameToParams(node.toMap(), null);
     final result =
-        await _channel.invokeListMethod('getNodeBoundingBox', params);
+    await _channel.invokeListMethod('getNodeBoundingBox', params);
     final typed = result!.map((e) => List<double>.from(e));
     final vectors = typed.map((e) => _vector3Converter.fromJson(e));
     return vectors.toList();
@@ -378,7 +378,7 @@ class ARKitController {
 
   Future<ARKitLightEstimate?> getLightEstimate() async {
     final estimate =
-        await _channel.invokeMethod<Map<dynamic, dynamic>>('getLightEstimate');
+    await _channel.invokeMethod<Map<dynamic, dynamic>>('getLightEstimate');
     return estimate != null
         ? ARKitLightEstimate.fromJson(estimate.cast<String, double>())
         : null;
@@ -402,7 +402,7 @@ class ARKitController {
 
   Future<Matrix4?> cameraProjectionMatrix() async {
     final cameraProjectionMatrix =
-        await _channel.invokeListMethod<double>('cameraProjectionMatrix');
+    await _channel.invokeListMethod<double>('cameraProjectionMatrix');
     return cameraProjectionMatrix != null
         ? _matrixConverter.fromJson(cameraProjectionMatrix)
         : null;
@@ -411,7 +411,7 @@ class ARKitController {
   /// Provides the point of view transform in world space (relative to the scene's root node)
   Future<Matrix4?> pointOfViewTransform() async {
     final pointOfViewTransform =
-        await _channel.invokeListMethod<double>('pointOfViewTransform');
+    await _channel.invokeListMethod<double>('pointOfViewTransform');
     return pointOfViewTransform != null
         ? _matrixConverter.fromJson(pointOfViewTransform)
         : null;
@@ -419,8 +419,8 @@ class ARKitController {
 
   Future<void> playAnimation(
       {required String key,
-      required String sceneName,
-      required String animationIdentifier}) {
+        required String sceneName,
+        required String animationIdentifier}) {
     return _channel.invokeMethod('playAnimation', {
       'key': key,
       'sceneName': sceneName,
@@ -477,7 +477,7 @@ class ARKitController {
           if (onARTap != null) {
             final input = call.arguments as List<dynamic>;
             final map1 =
-                input.map((e) => Map<String, dynamic>.from(e)).toList();
+            input.map((e) => Map<String, dynamic>.from(e)).toList();
             final map2 = map1.map((e) {
               return ARKitTestResult.fromJson(e);
             }).toList();
@@ -489,7 +489,7 @@ class ARKitController {
             final List<dynamic> input = call.arguments;
             final listMap = input.map((e) => Map<String, dynamic>.from(e));
             final objects =
-                listMap.map((e) => ARKitNodePinchResult.fromJson(e));
+            listMap.map((e) => ARKitNodePinchResult.fromJson(e));
             onNodePinch!(objects.toList());
           }
           break;
@@ -506,28 +506,28 @@ class ARKitController {
             final List<dynamic> input = call.arguments;
             final listMap = input.map((e) => Map<String, dynamic>.from(e));
             final objects =
-                listMap.map((e) => ARKitNodeRotationResult.fromJson(e));
+            listMap.map((e) => ARKitNodeRotationResult.fromJson(e));
             onNodeRotation!(objects.toList());
           }
           break;
         case 'didAddNodeForAnchor':
           if (onAddNodeForAnchor != null) {
             final anchor =
-                ARKitAnchor.fromJson(Map<String, dynamic>.from(call.arguments));
+            ARKitAnchor.fromJson(Map<String, dynamic>.from(call.arguments));
             onAddNodeForAnchor!(anchor);
           }
           break;
         case 'didUpdateNodeForAnchor':
           if (onUpdateNodeForAnchor != null) {
             final anchor =
-                ARKitAnchor.fromJson(Map<String, dynamic>.from(call.arguments));
+            ARKitAnchor.fromJson(Map<String, dynamic>.from(call.arguments));
             onUpdateNodeForAnchor!(anchor);
           }
           break;
         case 'didRemoveNodeForAnchor':
           if (onDidRemoveNodeForAnchor != null) {
             final anchor =
-                ARKitAnchor.fromJson(Map<String, dynamic>.from(call.arguments));
+            ARKitAnchor.fromJson(Map<String, dynamic>.from(call.arguments));
             onDidRemoveNodeForAnchor!(anchor);
           }
           break;
@@ -675,7 +675,7 @@ class ARKitController {
   void _subscribeToTextGeometry(ARKitNode node) {
     final text = node.geometry as ARKitText;
     text.text.addListener(
-        () => _updateSingleProperty(node, 'text', text.text.value, 'geometry'));
+            () => _updateSingleProperty(node, 'text', text.text.value, 'geometry'));
   }
 
   void _subscribeToSphereGeometry(ARKitNode node) {
@@ -740,4 +740,11 @@ class ARKitController {
     final result = await _channel.invokeMethod<Uint8List>('snapshot');
     return MemoryImage(result!);
   }
+
+  Future<String?> recordVideo() async{
+    final videoPath = await _channel.invokeMethod<String?>('recordVideo');
+    return videoPath;
+  }
+
+
 }
