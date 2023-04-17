@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "brightfutures",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Thomvis/BrightFutures",
+      "state" : {
+        "branch" : "master",
+        "revision" : "a4b4cb27ef1525739988184dac73a1a462f9d62d"
+      }
+    }
+  ],
+  "version" : 2
+}

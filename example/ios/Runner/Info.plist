@@ -26,6 +26,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>Record audio with video</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Save recorded video.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
